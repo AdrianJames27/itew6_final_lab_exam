@@ -16,7 +16,7 @@ class BookListCreateView(generics.ListCreateAPIView):
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    lookup_field = 'id'
+    lookup_field = 'id'  
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
