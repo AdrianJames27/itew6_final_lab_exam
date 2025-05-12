@@ -35,36 +35,45 @@ class BorrowBook(APIView):
         user_id = request.data.get('user_id')
         borrow_date = request.data.get('borrow_date')
 
+        # Check if book_id and user_id are provided
         if not book_id or not user_id:
             return Response({
-                'message': 'Missing Book ID or User ID'
+                'message': 'Both Book ID and User ID are required.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check if borrow_date is valid
         if borrow_date:
             try:
                 borrow_date = datetime.strptime(borrow_date, '%Y-%m-%d').date()
+                # Ensure borrow date is not in the past
+                if borrow_date < datetime.today().date():
+                    return Response({
+                        'message': 'Borrow date cannot be in the past. Please select a future date.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
             except ValueError:
                 return Response({
-                    'message': 'Invalid date format.'
+                    'message': 'Invalid date format. Please use YYYY-MM-DD.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
+        
         try:
             book = Book.objects.get(id=book_id)
         except Book.DoesNotExist:
             return Response({
-                'message': 'Book not found.'
+                'message': 'Book not found. Please check the Book ID.'
             }, status=status.HTTP_404_NOT_FOUND)
         
+        # Check if book has available copies
         if book.copies_available < 1:
             return Response({
-                'message': 'No copies available.'
+                'message': 'Sorry, no copies of this book are available for borrowing at the moment.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Deduct 1 available copy
         book.copies_available -= 1
         book.save()
 
-        # Record the borrow transaction
+        # Create a borrow transaction
         transaction = BorrowTransaction.objects.create(book=book, user_id=user_id, borrow_date=borrow_date)
         serializer = BorrowTransactionSerializer(transaction)
 

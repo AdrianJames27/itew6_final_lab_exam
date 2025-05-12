@@ -13,6 +13,7 @@
     "@akamine96204/jsdialog": "^3.4.6",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
+    "bootstrap-vue-next": "^0.29.3",
     "vue": "^3.5.13"
   },
   "devDependencies": {
