@@ -146,3 +146,4 @@ class UserListView(generics.ListAPIView):
     # exclude the super users
     queryset = User.objects.filter(is_superuser=False)
     serializer_class = UserSerializer
+    
